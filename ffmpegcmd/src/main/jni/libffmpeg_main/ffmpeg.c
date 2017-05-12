@@ -334,7 +334,7 @@ sigterm_handler(int sig)
         write(2/*STDERR_FILENO*/, "Received > 3 system signals, hard exiting\n",
                            strlen("Received > 3 system signals, hard exiting\n"));
 
-        exit(123);
+        exit_program(123);
     }
 }
 
@@ -466,7 +466,7 @@ const AVIOInterruptCB int_cb = { decode_interrupt_cb, NULL };
 static void ffmpeg_cleanup(int ret)
 {
     int i, j;
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg_cleanup...");
     if (do_benchmark) {
         int maxrss = getmaxrss() / 1024;
         av_log(NULL, AV_LOG_INFO, "bench: maxrss=%ikB\n", maxrss);
@@ -4713,10 +4713,23 @@ static int64_t getmaxrss(void)
 
 static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
+    static int print_prefix = 1;
+    static int count;
+    static char prev[1024];
+    char line[1024];
+    static int is_atty;
+
+    av_log_format_line(ptr, level, fmt, vl, line, sizeof(line), &print_prefix);
+
+    strcpy(prev, line);
+
+    LOGI("%s", line);
 }
 
-int main(int argc, char **argv)
+int run(int argc, char **argv)
 {
+    LOGI("run...........");
+    av_log(NULL, AV_LOG_FATAL, "run>>>>>>>>>>>>>\n");
     int i, ret;
     int64_t ti;
 
@@ -4729,11 +4742,11 @@ int main(int argc, char **argv)
     av_log_set_flags(AV_LOG_SKIP_REPEATED);
     parse_loglevel(argc, argv, options);
 
-    if(argc>1 && !strcmp(argv[1], "-d")){
+    if(argc>1 && !strcmp(argv[argc-1], "-d")){
         run_as_daemon=1;
         av_log_set_callback(log_callback_null);
         argc--;
-        argv++;
+        //argv++;
     }
 
     avcodec_register_all();
@@ -4748,8 +4761,10 @@ int main(int argc, char **argv)
 
     /* parse options and open all input/output files */
     ret = ffmpeg_parse_options(argc, argv);
-    if (ret < 0)
+    if (ret < 0) {
+        LOGI("Parser options failed.");
         exit_program(1);
+    }
 
     if (nb_output_files <= 0 && nb_input_files == 0) {
         show_usage();

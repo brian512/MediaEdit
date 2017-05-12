@@ -19,6 +19,8 @@
 #ifndef FFMPEG_H
 #define FFMPEG_H
 
+#include <android/log.h>
+
 #include "config.h"
 
 #include <stdint.h>
@@ -56,6 +58,10 @@
 #define VSYNC_DROP        0xff
 
 #define MAX_STREAMS 1024    /* arbitrary sanity check value */
+
+#define  LOG_TAG    "FFMPEG"
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
 enum HWAccelID {
     HWACCEL_NONE = 0,
@@ -657,5 +663,7 @@ int qsv_init(AVCodecContext *s);
 int vaapi_decode_init(AVCodecContext *avctx);
 int vaapi_device_init(const char *device);
 int cuvid_init(AVCodecContext *s);
+
+int run(int argc, char** argv);
 
 #endif /* FFMPEG_H */
