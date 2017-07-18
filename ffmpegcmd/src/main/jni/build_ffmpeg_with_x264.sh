@@ -53,7 +53,7 @@ source $X264_SOURCE_DIR/build_x264_for_android.sh
 
 
 #编译ffmpeg，编译为多个静态库#
-FFMPEG_SOURCE_DIR=ffmpeg-3.3
+FFMPEG_SOURCE_DIR=ffmpeg-3.3.2
 if [[ ! -d "$FFMPEG_SOURCE_DIR" ]]; then
     git clone git://source.ffmpeg.org/ffmpeg.git $FFMPEG_SOURCE_DIR
 fi

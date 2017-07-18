@@ -47,9 +47,9 @@ public class FFmpegCmd {
         if (sEnableDebug) {
             cmds.add(STR_DEBUG_PARAM);
         }
-        if (sIsBusy) {
-            throw new IllegalStateException("ffmpeg is busy");
-        }
+//        if (sIsBusy) {
+//            throw new IllegalStateException("ffmpeg is busy");
+//        }
         final String[] commands = cmds.toArray(new String[cmds.size()]);
         Runnable runnable = new Runnable() {
             @Override
@@ -166,6 +166,73 @@ public class FFmpegCmd {
         runSyn(cmds, callback);
     }
 
+    public static boolean cutVideo(String srcVideoName, float startTime, float endTime, String desVideoName) {
+        ArrayList<String> cmds = new ArrayList<>();
+        cmds.add("ffmpeg");
+        cmds.add("-i");
+        cmds.add(srcVideoName);
+
+        cmds.add("-y");
+        cmds.add("-ss");
+        cmds.add("" + startTime);
+        cmds.add("-t");
+        cmds.add("" + endTime);
+        cmds.add("-c");
+        cmds.add("copy");
+        cmds.add(desVideoName);
+
+        String[] commands = cmds.toArray(new String[cmds.size()]);
+        int result = runSafely(commands);
+
+        return result == 1;
+    }
+
+    public static void convertPic2Video(String picPath, float duration, String desVideoName, OnCompletionListener callback) {
+        ArrayList<String> cmds = new ArrayList<>();
+        cmds.add("ffmpeg");
+        cmds.add("-y");
+        cmds.add("-loop");
+        cmds.add("1");
+        cmds.add("-f");
+        cmds.add("image2");
+        cmds.add("-i");
+        cmds.add(picPath);
+
+        cmds.add("-t");
+        cmds.add(""+duration);
+        cmds.add("-r");
+        cmds.add("15");
+
+        cmds.add(desVideoName);
+
+        runSyn(cmds, callback);
+    }
+
+    public static void addGif2Video(String videoPath, String gifPath,
+                                    float x, float y,
+                                    float startTime,
+                                    String desVideoName, OnCompletionListener callback) {
+        ArrayList<String> cmds = new ArrayList<>();
+        cmds.add("ffmpeg");
+        cmds.add("-y");
+        cmds.add("-i");
+        cmds.add(videoPath);
+//        cmds.add("-ignore_loop");
+//        cmds.add("0");
+        cmds.add("-i");
+        cmds.add(gifPath);
+
+        cmds.add("-ss");
+        cmds.add("" + startTime);
+
+        cmds.add("-filter_complex");
+        cmds.add("overlay=" + x + ":" + y);
+
+        cmds.add(desVideoName);
+
+        runSyn(cmds, callback);
+    }
+
     public static void rotateVideo(String srcVideoName, String desVideoName, OnCompletionListener callback) {
         ArrayList<String> cmds = new ArrayList<>();
         cmds.add("ffmpeg");
@@ -254,6 +321,47 @@ public class FFmpegCmd {
         FileUtil.deleteFile(tmpFile);
 
         return result == 1;
+    }
+
+    /**
+     * 检测视频文件是否正确
+     */
+    public static void getVideoShoot(String videoPath, float time, String picPath, OnCompletionListener callback) {
+        ArrayList<String> cmds = new ArrayList<>();
+        cmds.add("ffmpeg");
+        cmds.add("-y");
+        cmds.add("-ss");
+        cmds.add("" + time);
+        cmds.add("-i");
+        cmds.add(videoPath);
+        cmds.add("-r");
+        cmds.add("1");
+        cmds.add("-vframes");
+        cmds.add("1");
+//        cmds.add("-vf");
+//        cmds.add("select=eq(pict_type\\,I)");
+        cmds.add("-an");
+        cmds.add("-f");
+        cmds.add("mjpeg");
+        cmds.add(picPath);
+
+        runSyn(cmds, callback);
+    }
+
+
+    public static void cropVideo(String videoPath, int startX, int startY, int width, int height,
+                                 String destPath, OnCompletionListener callback) {
+
+        ArrayList<String> cmds = new ArrayList<>();
+        cmds.add("ffmpeg");
+        cmds.add("-y");
+        cmds.add("-i");
+        cmds.add(videoPath);
+        cmds.add("-filter:v");
+        cmds.add("crop=" + width + ":" + height + ":" + startX + ":" + startY);
+        cmds.add(destPath);
+
+        runSyn(cmds, callback);
     }
 
     private static void callbackResult(int result, OnCompletionListener listener) {
