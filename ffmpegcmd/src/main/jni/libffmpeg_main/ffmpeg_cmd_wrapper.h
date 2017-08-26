@@ -8,13 +8,13 @@ extern "C" {
 #endif
 
 /*
- * Class:     com_brian_ffmpegcmd_jni_FFmpegCmd
+ * Class:     com_brian_recorder_jni_FFmpegCmd
  * Method:    run
  * Signature: ([Ljava/lang/String;)I
  */
 
 JNIEXPORT jint
-JNICALL Java_com_brian_ffmpegcmd_jni_FFmpegCmd_run
+JNICALL Java_com_brian_recorder_jni_FFmpegCmd_run
         (JNIEnv *env, jclass obj, jobjectArray commands);
 
 #ifdef __cplusplus

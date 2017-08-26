@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 JNIEXPORT jint
-JNICALL Java_com_brian_ffmpegcmd_jni_FFmpegCmd_run
+JNICALL Java_com_brian_recorder_jni_FFmpegCmd_run
         (JNIEnv *env, jclass obj, jobjectArray commands)
 {
     int argc = (*env)->GetArrayLength(env, commands);
