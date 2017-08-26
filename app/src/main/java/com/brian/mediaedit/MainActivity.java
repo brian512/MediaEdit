@@ -79,9 +79,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCompletion(boolean result) {
                 Log.d("MainActivity", "result=" + result);
-                mFilePathView.setText(destPath);
-                mVideoView.setVideoPath(destPath);
-                mVideoView.start();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mFilePathView.setText(destPath);
+                        mVideoView.setVideoPath(destPath);
+                        mVideoView.start();
+                    }
+                });
             }
         });
     }
